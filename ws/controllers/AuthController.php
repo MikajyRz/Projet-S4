@@ -14,12 +14,10 @@ class AuthController {
             return;
         }
 
-        // Try client authentication
         $user = Auth::authenticateClient($email, $password);
         error_log('Résultat authentification client: ' . ($user ? 'Succès' : 'Échec')); // Débogage
         
         if (!$user) {
-            // Try admin authentication
             $user = Auth::authenticateAdmin($email, $password);
             error_log('Résultat authentification admin: ' . ($user ? 'Succès' : 'Échec')); // Débogage
         }
