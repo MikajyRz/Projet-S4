@@ -1,6 +1,12 @@
 CREATE DATABASE pret;
 USE pret;
 
+CREATE TABLE Fond_Etablissement (
+    id_fond INT AUTO_INCREMENT PRIMARY KEY,
+    montant_total DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+    date_maj DATE NOT NULL    
+);
+
 CREATE TABLE Banquaire (
     id_bancaire INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(50) NOT NULL,
@@ -15,36 +21,57 @@ CREATE TABLE Clients (
     mot_de_passe VARCHAR(255) NOT NULL, 
     date_naissance DATE NOT NULL,
     adresse VARCHAR(255) NOT NULL,
-    telephone VARCHAR(15) NOT NULL
+    telephone VARCHAR(15) NOT NULL,
+    revenu_mensuel DECIMAL(10, 2) NOT NULL
 );
 
-CREATE TABLE Fond_Etablissement (
-    id_fond_etablissement INT AUTO_INCREMENT PRIMARY KEY,
-    nom VARCHAR(100) NOT NULL,
-    montant DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
-    date_maj DATE NOT NULL    
+CREATE TABLE Type_transaction (
+    id_type_transaction INT AUTO_INCREMENT PRIMARY KEY,
+    libelle VARCHAR(50) NOT NULL
 );
+
+CREATE TABLE transactions (
+    id_transaction INT AUTO_INCREMENT PRIMARY KEY,
+    id_fonds INT NOT NULL,
+    id_type_transaction INT NOT NULL,
+    id_pret INT,
+    date_transaction DATE NOT NULL,
+    FOREIGN KEY (id_fonds) REFERENCES Fond_Etablissement(id_fond)
+);
+
 
 CREATE TABLE TypePret (
     id_type_pret INT AUTO_INCREMENT PRIMARY KEY,
     libelle VARCHAR(50) NOT NULL,
-    taux DECIMAL(5, 2) NOT NULL,
+    taux_annuel DECIMAL(5, 2) NOT NULL,
     duree_max_mois INT NOT NULL,
-    montant_max DECIMAL(15, 2) NOT NULL
+    montant_min DECIMAL(15, 2) NOT NULL,
+    montant_max DECIMAL(15, 2) NOT NULL,
+    frais_dossier DECIMAL(5, 2) NOT NULL
+);
+
+CREATE TABLE StatutPret (
+    id_statut_pret INT AUTO_INCREMENT PRIMARY KEY,
+    libelle VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE Pret (
     id_pret INT AUTO_INCREMENT PRIMARY KEY,
     id_client INT NOT NULL,
     id_type_pret INT NOT NULL,
-    date_demande DATE NOT NULL,
+    id_statut_pret INT NOT NULL,
+    date_debut DATE NOT NULL,
     duree_mois INT NOT NULL,
     montant DECIMAL(10, 2) NOT NULL,
-    id_statut_pret INT NOT NULL,
+    taux_applique DECIMAL(5, 2) NOT NULL,
     FOREIGN KEY (id_client) REFERENCES Clients(id_client),
     FOREIGN KEY (id_type_pret) REFERENCES TypePret(id_type_pret),
     FOREIGN KEY (id_statut_pret) REFERENCES StatutPret(id_statut_pret)
 );
+
+
+
+
 
 
 -- CREATE TABLE TypeEtablissement (

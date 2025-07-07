@@ -2,71 +2,71 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tableau de bord Administrateur</title>
+    <title>Administration - Ajout de Fonds</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-    <h1>Tableau de bord Administrateur</h1>
-    <div id="dashboard-content"></div>
-    <a href="#" onclick="logout()">Déconnexion</a>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="w-full max-w-md">
+        <h1 class="text-2xl font-bold mb-6 text-center">Ajouter des Fonds</h1>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <form id="addFondsForm" class="space-y-4">
+                <div>
+                    <label for="montant" class="block text-sm font-medium text-gray-700">Montant (€)</label>
+                    <input type="number" step="0.01" min="0.01" id="montant" name="montant" 
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                           required>
+                </div>
+                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Ajouter
+                </button>
+            </form>
+            <div id="message" class="mt-4 text-sm hidden"></div>
+        </div>
+    </div>
 
     <script>
-        // Function to fetch admin dashboard data
-        async function fetchDashboard() {
+        const apiBase = "http://localhost/Projet-S4/ws";
+        document.getElementById('addFondsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const montant = document.getElementById('montant').value;
+            const messageDiv = document.getElementById('message');
+
+            // Validation côté client
+            if (!montant || parseFloat(montant) <= 0) {
+                messageDiv.classList.remove('hidden', 'text-green-500');
+                messageDiv.classList.add('text-red-500');
+                messageDiv.textContent = 'Veuillez entrer un montant positif.';
+                return;
+            }
+
             try {
-                const response = await fetch('/Projet-S4/ws/admin_accueil', {
-                    method: 'GET',
+                const response = await fetch(`${apiBase}/fonds`, {
+                    method: 'POST',
                     headers: {
-                        'Accept': 'application/json'
+                        'Content-Type': 'application/json',
                     },
-                    credentials: 'include' // Include cookies for session
+                    body: JSON.stringify({ montant: parseFloat(montant) })
                 });
 
-                console.log('Requête envoyée: GET /Projet-S4/ws/admin_accueil');
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                console.log('Réponse reçue:', data);
-
-                if (data.error) {
-                    console.error('Erreur:', data.error);
-                    document.getElementById('dashboard-content').innerHTML = `<p style="color: red;">${data.error}</p>`;
+                const result = await response.json();
+                
+                messageDiv.classList.remove('hidden');
+                if (response.ok) {
+                    messageDiv.classList.remove('text-red-500');
+                    messageDiv.classList.add('text-green-500');
+                    messageDiv.textContent = result.message;
+                    document.getElementById('addFondsForm').reset(); // Réinitialiser le formulaire
                 } else {
-                    document.getElementById('dashboard-content').innerHTML = `<p>${data.message}</p><p>Rôle: ${data.role}</p>`;
+                    messageDiv.classList.remove('text-green-500');
+                    messageDiv.classList.add('text-red-500');
+                    messageDiv.textContent = result.error || 'Erreur lors de l\'ajout des fonds.';
                 }
             } catch (error) {
-                console.error('Erreur de parsing JSON:', error.message);
-                document.getElementById('dashboard-content').innerHTML = `<p style="color: red;">Erreur: ${error.message}</p>`;
+                messageDiv.classList.remove('hidden', 'text-green-500');
+                messageDiv.classList.add('text-red-500');
+                messageDiv.textContent = 'Erreur de connexion au serveur.';
             }
-        }
-
-        // Function to handle logout
-        async function logout() {
-            try {
-                const response = await fetch('/Projet-S4/ws/logout', {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json'
-                    },
-                    credentials: 'include'
-                });
-
-                const data = await response.json();
-                console.log('Réponse logout:', data);
-
-                if (data.redirect) {
-                    window.location.href = data.redirect;
-                }
-            } catch (error) {
-                console.error('Erreur lors de la déconnexion:', error);
-            }
-        }
-
-        // Fetch dashboard data when the page loads
-        window.onload = fetchDashboard;
+        });
     </script>
 </body>
 </html>

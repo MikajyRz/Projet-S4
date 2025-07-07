@@ -12,6 +12,11 @@ INSERT INTO Clients (nom, email, mot_de_passe, date_naissance, adresse, telephon
 
 
 
+INSERT INTO Type_transaction (libelle) VALUES
+('fonds'),
+('Retrait'),
+('prêt'),
+('Remboursement');
 
 
 
@@ -31,10 +36,6 @@ INSERT INTO Clients (nom, email, mot_de_passe, date_naissance, adresse, telephon
 
 
 
-
-INSERT INTO TypePret(libelle) VALUES
-('Amortissable'),
-('Non amortissable');
 
 INSERT INTO TypeClient (libelle, duree_pret) VALUES
 ('Particuliers', 30),
