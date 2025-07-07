@@ -52,23 +52,32 @@ CREATE TABLE transactions (
 
 CREATE TABLE StatutPret (
     id_statut_pret INT AUTO_INCREMENT PRIMARY KEY,
-    libelle VARCHAR(50) NOT NULL
+    libelle VARCHAR(50) NOT NULL,
+    id_pret INT NOT NULL,
+    date_statut DATE NOT NULL,
+    FOREIGN KEY (id_pret) REFERENCES Pret(id_pret)
 );
 
 CREATE TABLE Pret (
     id_pret INT AUTO_INCREMENT PRIMARY KEY,
     id_client INT NOT NULL,
     id_type_pret INT NOT NULL,
-    id_statut_pret INT NOT NULL,
     date_debut DATE NOT NULL,
     duree_mois INT NOT NULL,
     montant DECIMAL(10, 2) NOT NULL,
-    taux_applique DECIMAL(5, 2) NOT NULL,
+    taux_mensuel DECIMAL(5, 2) NOT NULL,
     FOREIGN KEY (id_client) REFERENCES Clients(id_client),
-    FOREIGN KEY (id_type_pret) REFERENCES TypePret(id_type_pret),
-    FOREIGN KEY (id_statut_pret) REFERENCES StatutPret(id_statut_pret)
+    FOREIGN KEY (id_type_pret) REFERENCES TypePret(id_type_pret)
 );
 
+
+CREATE TABLE HistoriquePret (
+    id_historique INT AUTO_INCREMENT PRIMARY KEY,
+    id_pret INT NOT NULL,
+    mois DATE NOT NULL,
+    montant_mensuelite DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (id_pret) REFERENCES Pret(id_pret)
+);
 
 
 
@@ -79,23 +88,6 @@ CREATE TABLE Pret (
 --     libelle VARCHAR(50) NOT NULL
 -- );
 
-
-
-
-
--- CREATE TABLE TypeClient (
---     id_type_client INT AUTO_INCREMENT PRIMARY KEY,
---     libelle VARCHAR(50) NOT NULL,
---     duree_pret INT NOT NULL,
--- );
-
-
-
-
--- CREATE TABLE StatutPret (
---     id_statut_pret INT AUTO_INCREMENT PRIMARY KEY,
---     libelle VARCHAR(50) NOT NULL
--- );
 
 
 -- CREATE TABLE Compte (
