@@ -25,6 +25,15 @@ CREATE TABLE Clients (
     revenu_mensuel DECIMAL(10, 2) NOT NULL
 );
 
+CREATE TABLE TypePret (
+    id_type_pret INT AUTO_INCREMENT PRIMARY KEY,
+    libelle VARCHAR(50) NOT NULL,
+    taux_annuel DECIMAL(5, 2) NOT NULL,
+    duree_max_mois INT NOT NULL,
+    montant_min DECIMAL(15, 2) NOT NULL,
+    montant_max DECIMAL(15, 2) NOT NULL
+);
+
 CREATE TABLE Type_transaction (
     id_type_transaction INT AUTO_INCREMENT PRIMARY KEY,
     libelle VARCHAR(50) NOT NULL
@@ -40,15 +49,6 @@ CREATE TABLE transactions (
 );
 
 
-CREATE TABLE TypePret (
-    id_type_pret INT AUTO_INCREMENT PRIMARY KEY,
-    libelle VARCHAR(50) NOT NULL,
-    taux_annuel DECIMAL(5, 2) NOT NULL,
-    duree_max_mois INT NOT NULL,
-    montant_min DECIMAL(15, 2) NOT NULL,
-    montant_max DECIMAL(15, 2) NOT NULL,
-    frais_dossier DECIMAL(5, 2) NOT NULL
-);
 
 CREATE TABLE StatutPret (
     id_statut_pret INT AUTO_INCREMENT PRIMARY KEY,
