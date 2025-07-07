@@ -4,7 +4,7 @@ require_once __DIR__ . '/../db.php';
 class TypePret {
     public static function getAll() {
         $db = getDB();
-        $stmt = $db->query("SELECT * FROM Pret");
+        $stmt = $db->query("SELECT * FROM TypePret");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 

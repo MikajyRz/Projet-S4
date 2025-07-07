@@ -49,7 +49,6 @@ CREATE TABLE transactions (
 );
 
 
-
 CREATE TABLE StatutPret (
     id_statut_pret INT AUTO_INCREMENT PRIMARY KEY,
     libelle VARCHAR(50) NOT NULL,

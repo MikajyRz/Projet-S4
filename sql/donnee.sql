@@ -9,7 +9,11 @@ INSERT INTO Clients (nom, email, mot_de_passe, date_naissance, adresse, telephon
 ('Laura Dubois', 'laura.dubois@yahoo.com', 'secure1234', '1978-07-03', '8 boulevard Gambetta, Marseille', '0687654321'),
 ('Marc Petit', 'marc.petit@gmail.com', 'petitMarc56', '1995-02-18', '32 rue de la République, Lille', '0678912345');
 
-
+INSERT INTO StatutPret (libelle) VALUES
+('En attente'),
+('Approuve'),
+('Refuse'),
+('Rembourse');
 
 
 INSERT INTO Type_transaction (libelle) VALUES
