@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord Administrateur</title>
+</head>
+<body>
+    <h1>Tableau de bord Administrateur</h1>
+    <div id="dashboard-content"></div>
+    <a href="#" onclick="logout()">Déconnexion</a>
+
+    <script>
+        // Function to fetch admin dashboard data
+        async function fetchDashboard() {
+            try {
+                const response = await fetch('/Projet-S4/ws/admin_accueil', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'include' // Include cookies for session
+                });
+
+                console.log('Requête envoyée: GET /Projet-S4/ws/admin_accueil');
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Réponse reçue:', data);
+
+                if (data.error) {
+                    console.error('Erreur:', data.error);
+                    document.getElementById('dashboard-content').innerHTML = `<p style="color: red;">${data.error}</p>`;
+                } else {
+                    document.getElementById('dashboard-content').innerHTML = `<p>${data.message}</p><p>Rôle: ${data.role}</p>`;
+                }
+            } catch (error) {
+                console.error('Erreur de parsing JSON:', error.message);
+                document.getElementById('dashboard-content').innerHTML = `<p style="color: red;">Erreur: ${error.message}</p>`;
+            }
+        }
+
+        // Function to handle logout
+        async function logout() {
+            try {
+                const response = await fetch('/Projet-S4/ws/logout', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+                console.log('Réponse logout:', data);
+
+                if (data.redirect) {
+                    window.location.href = data.redirect;
+                }
+            } catch (error) {
+                console.error('Erreur lors de la déconnexion:', error);
+            }
+        }
+
+        // Fetch dashboard data when the page loads
+        window.onload = fetchDashboard;
+    </script>
+</body>
+</html>

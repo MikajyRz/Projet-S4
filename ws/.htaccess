@@ -1,0 +1,4 @@
+RewriteEngine On
+RewriteBase /Projet-S4/ws/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [QSA,L]
