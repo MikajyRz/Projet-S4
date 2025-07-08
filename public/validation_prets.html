@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validation des Prêts - Administration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .pret-card {
+            border-left: 4px solid #007bff;
+            transition: all 0.3s ease;
+        }
+        .pret-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .status-badge {
+            font-size: 0.8em;
+        }
+        .btn-action {
+            margin: 2px;
+        }
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="admin_accueil.html">
+                                <i class="fas fa-home"></i> Accueil
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white active" href="validation_prets.html">
+                                <i class="fas fa-check-circle"></i> Validation Prêts
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="#">
+                                <i class="fas fa-chart-bar"></i> Statistiques
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        <i class="fas fa-check-circle text-primary"></i>
+                        Validation des Prêts
+                    </h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button class="btn btn-outline-primary" onclick="chargerPretsEnAttente()">
+                            <i class="fas fa-sync-alt"></i> Actualiser
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Statistiques -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body">
+                                <h5 class="card-title">En Attente</h5>
+                                <h3 id="count-en-attente">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body">
+                                <h5 class="card-title">Validés</h5>
+                                <h3 id="count-valides">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-danger text-white">
+                            <div class="card-body">
+                                <h5 class="card-title">Refusés</h5>
+                                <h3 id="count-refuses">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-info text-white">
+                            <div class="card-body">
+                                <h5 class="card-title">Fonds Disponibles</h5>
+                                <h3 id="fonds-disponibles">0€</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Liste des prêts en attente -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-clock"></i> Prêts en Attente de Validation</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="prets-en-attente" class="row">
+                            <!-- Les prêts seront chargés ici -->
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal de validation -->
+    <div class="modal fade" id="modalValidation" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-check-circle"></i> Valider le Prêt
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Informations du Client</h6>
+                            <p><strong>Nom:</strong> <span id="client-nom"></span></p>
+                            <p><strong>Email:</strong> <span id="client-email"></span></p>
+                            <p><strong>Revenu mensuel:</strong> <span id="client-revenu"></span>€</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Détails du Prêt</h6>
+                            <p><strong>Type:</strong> <span id="pret-type"></span></p>
+                            <p><strong>Montant:</strong> <span id="pret-montant"></span>€</p>
+                            <p><strong>Durée:</strong> <span id="pret-duree"></span> mois</p>
+                            <p><strong>Taux annuel:</strong> <span id="pret-taux"></span>%</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <label for="banquier-select" class="form-label">Banquier validateur:</label>
+                        <select class="form-select" id="banquier-select" required>
+                            <option value="">Sélectionner un banquier</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="commentaire-validation" class="form-label">Commentaire (optionnel):</label>
+                        <textarea class="form-control" id="commentaire-validation" rows="3" placeholder="Commentaire sur la validation..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-success" onclick="validerPret()">
+                        <i class="fas fa-check"></i> Valider le Prêt
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de refus -->
+    <div class="modal fade" id="modalRefus" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-times-circle"></i> Refuser le Prêt
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="banquier-refus" class="form-label">Banquier:</label>
+                        <select class="form-select" id="banquier-refus" required>
+                            <option value="">Sélectionner un banquier</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="motif-refus" class="form-label">Motif du refus *:</label>
+                        <textarea class="form-control" id="motif-refus" rows="4" placeholder="Expliquez le motif du refus..." required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="commentaire-refus" class="form-label">Commentaire (optionnel):</label>
+                        <textarea class="form-control" id="commentaire-refus" rows="2" placeholder="Commentaire supplémentaire..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-danger" onclick="refuserPret()">
+                        <i class="fas fa-times"></i> Refuser le Prêt
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal d'historique -->
+    <div class="modal fade" id="modalHistorique" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-history"></i> Historique du Prêt
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="historique-content">
+                        <!-- L'historique sera chargé ici -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const apiBase = "http://localhost/Projet-S4/ws";
+
+        function ajax(method, url, data, callback) {
+            const xhr = new XMLHttpRequest();
+            xhr.open(method, apiBase + url, true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = () => {
+                if (xhr.readyState === 4) {
+                    console.log('Réponse brute:', xhr.responseText);
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        callback(response, xhr.status);
+                    } catch (e) {
+                        callback({ error: `Erreur de parsing JSON: ${e.message}` }, xhr.status);
+                    }
+                }
+            };
+            console.log('Envoi de la requête:', method, apiBase + url, data);
+            xhr.send(data);
+        }
+
+        let currentPretId = null;
+        let banquiers = [];
+
+        // Chargement initial
+        document.addEventListener('DOMContentLoaded', function() {
+            chargerBanquiers();
+            chargerPretsEnAttente();
+            chargerStatistiques();
+        });
+
+        // Charger les banquiers
+        function chargerBanquiers() {
+            ajax('GET', '/banquiers', null, (response, status) => {
+                if (status === 200 && !response.error) {
+                    banquiers = response;
+                    
+                    const selectValidation = document.getElementById('banquier-select');
+                    const selectRefus = document.getElementById('banquier-refus');
+                    
+                    selectValidation.innerHTML = '<option value="">Sélectionner un banquier</option>';
+                    selectRefus.innerHTML = '<option value="">Sélectionner un banquier</option>';
+                    
+                    banquiers.forEach(banquier => {
+                        selectValidation.innerHTML += `<option value="${banquier.id_bancaire}">${banquier.nom}</option>`;
+                        selectRefus.innerHTML += `<option value="${banquier.id_bancaire}">${banquier.nom}</option>`;
+                    });
+                } else {
+                    console.error('Erreur lors du chargement des banquiers:', response.error);
+                }
+            });
+        }
+
+        // Charger les prêts en attente
+        function chargerPretsEnAttente() {
+            ajax('GET', '/pret/en-attente', null, (response, status) => {
+                if (status === 200 && !response.error) {
+                    const container = document.getElementById('prets-en-attente');
+                    container.innerHTML = '';
+                    
+                    if (response.length === 0) {
+                        container.innerHTML = '<div class="col-12 text-center text-muted"><p>Aucun prêt en attente de validation</p></div>';
+                        return;
+                    }
+                    
+                    response.forEach(pret => {
+                        const card = createPretCard(pret);
+                        container.appendChild(card);
+                    });
+                } else {
+                    console.error('Erreur lors du chargement des prêts:', response.error);
+                }
+            });
+        }
+
+        // Créer une carte de prêt
+        function createPretCard(pret) {
+            const col = document.createElement('div');
+            col.className = 'col-md-6 col-lg-4 mb-3';
+            
+            col.innerHTML = `
+                <div class="card pret-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="card-title">Prêt #${pret.id_pret}</h6>
+                            <span class="badge bg-warning status-badge">En attente</span>
+                        </div>
+                        <p class="card-text"><strong>Client:</strong> ${pret.client_nom}</p>
+                        <p class="card-text"><strong>Type:</strong> ${pret.type_pret_libelle}</p>
+                        <p class="card-text"><strong>Montant:</strong> ${pret.montant}€</p>
+                        <p class="card-text"><strong>Durée:</strong> ${pret.duree_mois} mois</p>
+                        <p class="card-text"><strong>Date demande:</strong> ${new Date(pret.date_demande).toLocaleDateString()}</p>
+                        <div class="mt-3">
+                            <button class="btn btn-success btn-sm btn-action" onclick="ouvrirModalValidation(${pret.id_pret})">
+                                <i class="fas fa-check"></i> Valider
+                            </button>
+                            <button class="btn btn-danger btn-sm btn-action" onclick="ouvrirModalRefus(${pret.id_pret})">
+                                <i class="fas fa-times"></i> Refuser
+                            </button>
+                            <button class="btn btn-info btn-sm btn-action" onclick="voirHistorique(${pret.id_pret})">
+                                <i class="fas fa-history"></i> Historique
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            return col;
+        }
+
+        // Charger les statistiques
+        function chargerStatistiques() {
+            // Charger les prêts
+            ajax('GET', '/pret', null, (responsePrets, statusPrets) => {
+                if (statusPrets === 200 && !responsePrets.error) {
+                    // Charger les fonds
+                    ajax('GET', '/fonds', null, (responseFonds, statusFonds) => {
+                        if (statusFonds === 200 && responseFonds !== null) {
+                            const enAttente = responsePrets.filter(p => p.statut_actuel === 'En attente de validation').length;
+                            const valides = responsePrets.filter(p => p.statut_actuel === 'Validé').length;
+                            const refuses = responsePrets.filter(p => p.statut_actuel === 'Refusé').length;
+                            
+                            document.getElementById('count-en-attente').textContent = enAttente;
+                            document.getElementById('count-valides').textContent = valides;
+                            document.getElementById('count-refuses').textContent = refuses;
+                            document.getElementById('fonds-disponibles').textContent = responseFonds + '€';
+                        } else {
+                            console.error('Erreur lors du chargement des fonds');
+                        }
+                    });
+                } else {
+                    console.error('Erreur lors du chargement des prêts pour les statistiques');
+                }
+            });
+        }
+
+        // Ouvrir modal de validation
+        function ouvrirModalValidation(idPret) {
+            currentPretId = idPret;
+            // Ici vous pourriez charger les détails du prêt si nécessaire
+            const modal = new bootstrap.Modal(document.getElementById('modalValidation'));
+            modal.show();
+        }
+
+        // Ouvrir modal de refus
+        function ouvrirModalRefus(idPret) {
+            currentPretId = idPret;
+            const modal = new bootstrap.Modal(document.getElementById('modalRefus'));
+            modal.show();
+        }
+
+        // Valider un prêt
+        function validerPret() {
+            const idBanquier = document.getElementById('banquier-select').value;
+            const commentaire = document.getElementById('commentaire-validation').value;
+            
+            if (!idBanquier) {
+                alert('Veuillez sélectionner un banquier');
+                return;
+            }
+            
+            const data = `id_pret=${currentPretId}&id_bancaire=${idBanquier}&commentaire=${encodeURIComponent(commentaire)}`;
+            
+            ajax('POST', '/pret/valider', data, (response, status) => {
+                if (status === 200 && !response.error) {
+                    alert('Prêt validé avec succès!');
+                    bootstrap.Modal.getInstance(document.getElementById('modalValidation')).hide();
+                    chargerPretsEnAttente();
+                    chargerStatistiques();
+                } else {
+                    alert('Erreur: ' + (response.error || 'Erreur lors de la validation'));
+                }
+            });
+        }
+
+        // Refuser un prêt
+        function refuserPret() {
+            const idBanquier = document.getElementById('banquier-refus').value;
+            const motifRefus = document.getElementById('motif-refus').value;
+            const commentaire = document.getElementById('commentaire-refus').value;
+            
+            if (!idBanquier || !motifRefus) {
+                alert('Veuillez remplir tous les champs obligatoires');
+                return;
+            }
+            
+            const data = `id_pret=${currentPretId}&id_bancaire=${idBanquier}&motif_refus=${encodeURIComponent(motifRefus)}&commentaire=${encodeURIComponent(commentaire)}`;
+            
+            ajax('POST', '/pret/refuser', data, (response, status) => {
+                if (status === 200 && !response.error) {
+                    alert('Prêt refusé avec succès!');
+                    bootstrap.Modal.getInstance(document.getElementById('modalRefus')).hide();
+                    chargerPretsEnAttente();
+                    chargerStatistiques();
+                } else {
+                    alert('Erreur: ' + (response.error || 'Erreur lors du refus'));
+                }
+            });
+        }
+
+        // Voir l'historique d'un prêt
+        function voirHistorique(idPret) {
+            ajax('GET', `/pret/${idPret}/historique`, null, (response, status) => {
+                if (status === 200 && !response.error) {
+                    const container = document.getElementById('historique-content');
+                    container.innerHTML = '';
+                    
+                    if (response.length === 0) {
+                        container.innerHTML = '<p class="text-muted">Aucun historique disponible</p>';
+                    } else {
+                        const table = document.createElement('table');
+                        table.className = 'table table-striped';
+                        table.innerHTML = `
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Statut</th>
+                                    <th>Banquier</th>
+                                    <th>Commentaire</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${response.map(h => `
+                                    <tr>
+                                        <td>${new Date(h.date_statut).toLocaleString()}</td>
+                                        <td><span class="badge bg-secondary">${h.statut_libelle}</span></td>
+                                        <td>${h.banquier_nom || '-'}</td>
+                                        <td>${h.commentaire || '-'}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        `;
+                        container.appendChild(table);
+                    }
+                    
+                    const modal = new bootstrap.Modal(document.getElementById('modalHistorique'));
+                    modal.show();
+                } else {
+                    console.error('Erreur lors du chargement de l\'historique:', response.error);
+                    alert('Erreur lors du chargement de l\'historique');
+                }
+            });
+        }
+    </script>
+</body>
+</html> 

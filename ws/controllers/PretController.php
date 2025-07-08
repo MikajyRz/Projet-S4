@@ -54,6 +54,102 @@ class PretController {
         }
     }
 
+    // Méthode pour valider un prêt
+    public static function validerPret() {
+        $data = Flight::request()->data;
+
+        // Validation des champs requis
+        if (!isset($data->id_pret) || !is_numeric($data->id_pret)) {
+            Flight::json(['error' => 'L\'ID du prêt est requis et doit être un nombre.'], 400);
+            return;
+        }
+        if (!isset($data->id_bancaire) || !is_numeric($data->id_bancaire)) {
+            Flight::json(['error' => 'L\'ID du banquier est requis et doit être un nombre.'], 400);
+            return;
+        }
+
+        $commentaire = isset($data->commentaire) ? $data->commentaire : '';
+
+        try {
+            $result = Pret::validerPret(
+                (int)$data->id_pret,
+                (int)$data->id_bancaire,
+                $commentaire
+            );
+            
+            if ($result['success']) {
+                Flight::json(['message' => $result['message'], 'pret' => $result['pret']], 200);
+            } else {
+                Flight::json(['error' => $result['message']], 400);
+            }
+        } catch (Exception $e) {
+            Flight::json(['error' => 'Erreur serveur: ' . $e->getMessage()], 500);
+        }
+    }
+
+    // Méthode pour refuser un prêt
+    public static function refuserPret() {
+        $data = Flight::request()->data;
+
+        // Validation des champs requis
+        if (!isset($data->id_pret) || !is_numeric($data->id_pret)) {
+            Flight::json(['error' => 'L\'ID du prêt est requis et doit être un nombre.'], 400);
+            return;
+        }
+        if (!isset($data->id_bancaire) || !is_numeric($data->id_bancaire)) {
+            Flight::json(['error' => 'L\'ID du banquier est requis et doit être un nombre.'], 400);
+            return;
+        }
+        if (!isset($data->motif_refus) || empty(trim($data->motif_refus))) {
+            Flight::json(['error' => 'Le motif de refus est requis.'], 400);
+            return;
+        }
+
+        $commentaire = isset($data->commentaire) ? $data->commentaire : '';
+
+        try {
+            $result = Pret::refuserPret(
+                (int)$data->id_pret,
+                (int)$data->id_bancaire,
+                $data->motif_refus,
+                $commentaire
+            );
+            
+            if ($result['success']) {
+                Flight::json(['message' => $result['message'], 'pret' => $result['pret']], 200);
+            } else {
+                Flight::json(['error' => $result['message']], 400);
+            }
+        } catch (Exception $e) {
+            Flight::json(['error' => 'Erreur serveur: ' . $e->getMessage()], 500);
+        }
+    }
+
+    // Méthode pour récupérer les prêts en attente
+    public static function getPretsEnAttente() {
+        try {
+            $prets = Pret::getPretsEnAttente();
+            Flight::json($prets);
+        } catch (Exception $e) {
+            Flight::json(['error' => 'Erreur lors de la récupération des prêts en attente: ' . $e->getMessage()], 500);
+        }
+    }
+
+    // Méthode pour récupérer l'historique d'un prêt
+    public static function getHistoriquePret($id_pret) {
+        if (!is_numeric($id_pret)) {
+            Flight::json(['error' => 'L\'ID du prêt doit être un nombre.'], 400);
+            return;
+        }
+
+        try {
+            $historique = Pret::getHistoriquePret((int)$id_pret);
+            Flight::json($historique);
+        } catch (Exception $e) {
+            Flight::json(['error' => 'Erreur lors de la récupération de l\'historique: ' . $e->getMessage()], 500);
+        }
+    }
+
     public static function getAllClients() {
         try {
             $clients = Pret::getAllClients();
@@ -69,6 +165,16 @@ class PretController {
             Flight::json($fonds);
         } catch (Exception $e) {
             Flight::json(['error' => 'Erreur lors de la récupération des fonds: ' . $e->getMessage()], 500);
+        }
+    }
+
+    // Méthode pour récupérer tous les banquiers
+    public static function getAllBanquiers() {
+        try {
+            $banquiers = Pret::getAllBanquiers();
+            Flight::json($banquiers);
+        } catch (Exception $e) {
+            Flight::json(['error' => 'Erreur lors de la récupération des banquiers: ' . $e->getMessage()], 500);
         }
     }
 }

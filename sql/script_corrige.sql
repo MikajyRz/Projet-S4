@@ -45,7 +45,16 @@ CREATE TABLE StatutPret (
     libelle VARCHAR(50) NOT NULL
 );
 
--- Table principale des prêts
+-- Insertion des statuts AVANT de créer la table Pret
+INSERT INTO StatutPret (libelle) VALUES 
+('En attente de validation'),
+('Validé'),
+('Refusé'),
+('En cours'),
+('Terminé'),
+('En défaut');
+
+-- Table principale des prêts (maintenant les statuts existent)
 CREATE TABLE Pret (
     id_pret INT AUTO_INCREMENT PRIMARY KEY,
     id_client INT NOT NULL,
@@ -98,15 +107,6 @@ CREATE TABLE HistoriquePret (
     FOREIGN KEY (id_pret) REFERENCES Pret(id_pret)
 );
 
--- Insertion des statuts de base
-INSERT INTO StatutPret (libelle) VALUES 
-('En attente de validation'),
-('Validé'),
-('Refusé'),
-('En cours'),
-('Terminé'),
-('En défaut');
-
 -- Insertion des types de transactions
 INSERT INTO Type_transaction (libelle) VALUES 
 ('Déblocage de prêt'),
@@ -121,21 +121,16 @@ INSERT INTO Fond_Etablissement (montant_total, date_maj) VALUES (1000000.00, CUR
 -- Insertion d'un banquier par défaut
 INSERT INTO Banquaire (nom, email, mot_de_passe) VALUES ('Admin', 'admin@banque.com', 'password123');
 
+-- Insertion de données de test
+INSERT INTO TypePret (libelle, taux_annuel, duree_max_mois, montant_min, montant_max) VALUES 
+('Prêt personnel', 8.50, 60, 1000.00, 50000.00),
+('Prêt immobilier', 3.20, 300, 50000.00, 500000.00),
+('Prêt automobile', 6.80, 84, 5000.00, 100000.00);
 
+INSERT INTO Clients (nom, email, mot_de_passe, date_naissance, adresse, telephone, revenu_mensuel) VALUES 
+('Dupont Jean', 'jean.dupont@email.com', 'motdepasse123', '1985-03-15', '123 Rue de la Paix, Paris', '0123456789', 3500.00),
+('Martin Marie', 'marie.martin@email.com', 'motdepasse456', '1990-07-22', '456 Avenue Victor Hugo, Lyon', '0987654321', 4200.00);
 
-
-
--- CREATE TABLE TypeEtablissement (
---     id_type_etablissement INT AUTO_INCREMENT PRIMARY KEY,
---     libelle VARCHAR(50) NOT NULL
--- );
-
-
-
--- CREATE TABLE Compte (
---     id_compte INT AUTO_INCREMENT PRIMARY KEY,
---     id_client INT NOT NULL,
---     solde DECIMAL(10, 2) NOT NULL DEFAULT 0,
---     date_creation DATE NOT NULL,
---     FOREIGN KEY (id_client) REFERENCES Clients(id_client)
--- );
+INSERT INTO Banquaire (nom, email, mot_de_passe) VALUES 
+('Durand Sophie', 'sophie.durand@banque.com', 'banquier123'),
+('Leroy Michel', 'michel.leroy@banque.com', 'banquier456'); 

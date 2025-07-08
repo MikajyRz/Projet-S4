@@ -9,5 +9,6 @@ require 'routes/auth_routes.php';
 require 'routes/fond_routes.php';
 require 'routes/type_pret_routes.php';
 require 'routes/pret_routes.php';
+require 'routes/interets_routes.php';
 
 Flight::start();
