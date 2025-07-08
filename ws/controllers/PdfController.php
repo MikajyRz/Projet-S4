@@ -7,19 +7,15 @@ class PdfController {
 
     public static function generatePretPdf($id_pret) {
         try {
-            // Récupérer les données du prêt
             $pret = Pret::getById($id_pret);
             if (!$pret) {
                 Flight::halt(404, json_encode(['error' => 'Prêt non trouvé']));
             }
 
-            // Récupérer les remboursements
             $remboursements = Remboursement::getByPretId($id_pret);
 
-            // Générer le HTML du PDF
             $html = self::generatePretHtml($pret, $remboursements);
 
-            // Retourner le HTML (pour l'instant, on peut utiliser une bibliothèque comme TCPDF ou DOMPDF)
             Flight::json([
                 'success' => true,
                 'html' => $html,

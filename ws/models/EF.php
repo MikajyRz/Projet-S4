@@ -3,7 +3,6 @@ require_once __DIR__ . '/../db.php';
 
 class EF {
 
-    // ========== Établissements Financiers ==========
 
     public static function getAll() {
         $db = getDB();
@@ -37,7 +36,6 @@ class EF {
         $stmt->execute([$id]);
     }
 
-    // ========== Fonds ==========
 
     public static function getAllFonds() {
         $db = getDB();

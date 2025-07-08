@@ -13,15 +13,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 }
 
 function getDB() {
-    // $host = 'localhost';
-    // $dbname = 'pret_db'; // Changement du nom de la base de données
-    // $username = 'root';
-    // $password = '';
-
     $host = 'localhost';
-    $dbname = 'db_S2_ETU003214'; // Changement du nom de la base de données
-    $username = 'ETU003214';
-    $password = '2rdNrl3U';
+    $dbname = 'pret_db'; // Changement du nom de la base de données
+    $username = 'root';
+    $password = '';
+
+    // $host = 'localhost';
+    // $dbname = 'db_S2_ETU003172'; // Changement du nom de la base de données
+    // $username = 'ETU003172';
+    // $password = 'NFwLtSKq';
 
     try {
         return new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password, [

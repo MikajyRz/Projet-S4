@@ -3,8 +3,6 @@ require_once __DIR__ . '/../models/Pret.php';
 
 class EFController {
 
-    // ========= TYPE PRET ==========
-
     public static function getAllTypePret() {
         $prets = Pret::getAllTypePrets();
         Flight::json($prets);
