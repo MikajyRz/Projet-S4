@@ -1,13 +1,31 @@
-// Fonction utilitaire pour les appels AJAX
 function ajax(method, url, data, callback) {
     const xhr = new XMLHttpRequest();
-    xhr.open(method, "http://localhost/Projet-S4/ws" + url, true);
+    const apiBase = "/ws"; // Utilisez un chemin relatif
+    xhr.open(method, apiBase + url, true);
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    
     xhr.onreadystatechange = () => {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            callback(JSON.parse(xhr.responseText));
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                try {
+                    const response = xhr.responseText ? JSON.parse(xhr.responseText) : {};
+                    callback(response);
+                } catch (e) {
+                    console.error("Erreur parsing JSON:", e);
+                    showNotification("Erreur dans la réponse du serveur", 'error');
+                }
+            } else {
+                const errorMsg = `Erreur ${xhr.status}: ${xhr.statusText}`;
+                console.error(errorMsg);
+                showNotification(errorMsg, 'error');
+            }
         }
     };
+    
+    xhr.onerror = function() {
+        showNotification("Erreur de connexion au serveur", 'error');
+    };
+    
     xhr.send(data);
 }
 

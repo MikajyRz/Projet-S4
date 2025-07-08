@@ -132,4 +132,31 @@ class EFController {
             Flight::halt(400, json_encode(['error' => $e->getMessage()]));
         }
     }
+
+    
+        public static function sauvegarderSimulation() {
+            $data = Flight::request()->data;
+            
+            if (!isset($data->id_pret, $data->montant, $data->taux, $data->duree)) {
+                Flight::halt(400, json_encode(['error' => 'Données incomplètes']));
+            }
+    
+            $db = getDB();
+            $stmt = $db->prepare("INSERT INTO pret_simulation (id_pret, montant, taux, duree, assurance, details) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->execute([
+                $data->id_pret,
+                $data->montant,
+                $data->taux,
+                $data->duree,
+                $data->assurance ?? 0,
+                json_encode($data->details ?? [])
+            ]);
+            
+            Flight::json(['message' => 'Simulation sauvegardée', 'id' => $db->lastInsertId()]);
+    }
+    public static function getSimulations() {
+        $db = getDB();
+        $stmt = $db->query("SELECT * FROM pret_simulation ORDER BY date_simulation DESC");
+        Flight::json($stmt->fetchAll(PDO::FETCH_ASSOC));
+    }
 }

@@ -69,6 +69,9 @@ ob_start();
                 🧮 Simuler
             </button>
         </div>
+        <button class="btn btn-success" onclick="sauvegarderSimulation()" id="btn-sauvegarder" style="display: none;">
+                💾 Sauvegarder
+        </button>
     </div>
 </div>
 
@@ -78,6 +81,28 @@ ob_start();
         <h2 class="card-title">📊 Résultat de la Simulation</h2>
     </div>
     <div id="simulation-content"></div>
+</div>
+<!-- Liste des simulations sauvegardées -->
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">📚 Simulations Sauvegardées</h2>
+    </div>
+    <div class="table-container">
+        <table class="table" id="table-simulations">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Prêt</th>
+                    <th>Montant</th>
+                    <th>Taux</th>
+                    <th>Durée</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 </div>
 
 <!-- Formulaire de validation -->
@@ -179,6 +204,57 @@ ob_start();
         xhr.send(data);
     }
 
+    let simulationActuelle = null;
+
+function simulerRemboursement() {
+    const id_pret = document.getElementById("id_pret_simulation").value;
+    
+    if (!id_pret) {
+        alert("Veuillez sélectionner un prêt");
+        return;
+    }
+
+    ajax("GET", `/prets/${id_pret}`, null, (pret) => {
+        const data = `montant=${pret.montant}&taux=${pret.taux}&duree=${pret.duree}&assurance=${pret.assurance || 0}&date_pret=${pret.date_pret}`;
+        
+        ajax("POST", "/prets/simuler", data, (simulation) => {
+            simulationActuelle = {
+                id_pret: id_pret,
+                montant: pret.montant,
+                taux: pret.taux,
+                duree: pret.duree,
+                assurance: pret.assurance || 0,
+                details: simulation
+            };
+            
+            // Afficher le bouton de sauvegarde
+            document.getElementById("btn-sauvegarder").style.display = "inline-block";
+            
+            // Reste du code d'affichage de la simulation...
+        });
+    });
+}
+
+function sauvegarderSimulation() {
+    if (!simulationActuelle) {
+        alert("Aucune simulation à sauvegarder");
+        return;
+    }
+
+    const data = new URLSearchParams();
+    data.append('id_pret', simulationActuelle.id_pret);
+    data.append('montant', simulationActuelle.montant);
+    data.append('taux', simulationActuelle.taux);
+    data.append('duree', simulationActuelle.duree);
+    data.append('assurance', simulationActuelle.assurance);
+    data.append('details', JSON.stringify(simulationActuelle.details));
+
+    ajax("POST", "/prets/sauvegarder-simulation", data, (response) => {
+        alert("Simulation sauvegardée avec succès !");
+        document.getElementById("btn-sauvegarder").style.display = "none";
+    });
+}
+
     function chargerPrets() {
         ajax("GET", "/prets", null, (data) => {
             const selectSimulation = document.getElementById("id_pret_simulation");
@@ -200,6 +276,54 @@ ob_start();
             });
         });
     }
+
+// Ajoutez cette fonction pour charger les simulations
+function chargerSimulations() {
+    ajax("GET", "/prets/simulations", null, (data) => {
+        const tbody = document.querySelector("#table-simulations tbody");
+        tbody.innerHTML = "";
+        
+        data.forEach(sim => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${sim.id_simulation}</td>
+                <td>Prêt #${sim.id_pret}</td>
+                <td>${sim.montant}€</td>
+                <td>${sim.taux}%</td>
+                <td>${sim.duree} mois</td>
+                <td>${new Date(sim.date_simulation).toLocaleString()}</td>
+                <td>
+                    <button class="btn btn-secondary" onclick="afficherSimulation(${sim.id_simulation})">
+                        👁️ Voir
+                    </button>
+                    <button class="btn btn-danger" onclick="supprimerSimulation(${sim.id_simulation})">
+                        🗑️ Supprimer
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    });
+}
+
+function afficherSimulation(id) {
+    // Implémentez l'affichage détaillé d'une simulation
+}
+
+function supprimerSimulation(id) {
+    if (confirm("Supprimer cette simulation ?")) {
+        ajax("DELETE", `/prets/simulations/${id}`, null, () => {
+            chargerSimulations();
+        });
+    }
+}
+
+// N'oubliez pas d'appeler chargerSimulations() au chargement de la page
+document.addEventListener('DOMContentLoaded', () => {
+    chargerPrets();
+    chargerStatistiques();
+    chargerSimulations();
+});
 
     function simulerRemboursement() {
         const id_pret = document.getElementById("id_pret_simulation").value;
@@ -376,6 +500,53 @@ ob_start();
             }
         });
     }
+
+    function chargerSimulations() {
+    ajax("GET", "/prets/simulations", null, (data) => {
+        const tbody = document.querySelector("#table-simulations tbody");
+        tbody.innerHTML = "";
+        
+        data.forEach(sim => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${sim.id_simulation}</td>
+                <td>Prêt #${sim.id_pret}</td>
+                <td>${sim.montant}€</td>
+                <td>${sim.taux}%</td>
+                <td>${sim.duree} mois</td>
+                <td>${new Date(sim.date_simulation).toLocaleString()}</td>
+                <td>
+                    <button class="btn btn-secondary" onclick="afficherSimulation(${sim.id_simulation})">
+                        👁️ Voir
+                    </button>
+                    <button class="btn btn-danger" onclick="supprimerSimulation(${sim.id_simulation})">
+                        🗑️ Supprimer
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    });
+}
+
+        function afficherSimulation(id) {
+            // Implémentez l'affichage détaillé d'une simulation
+        }
+
+        function supprimerSimulation(id) {
+            if (confirm("Supprimer cette simulation ?")) {
+                ajax("DELETE", `/prets/simulations/${id}`, null, () => {
+                    chargerSimulations();
+                });
+            }
+        }
+
+        // N'oubliez pas d'appeler chargerSimulations() au chargement de la page
+        document.addEventListener('DOMContentLoaded', () => {
+            chargerPrets();
+            chargerStatistiques();
+            chargerSimulations();
+        });
 
     function exporterRemboursements() {
         alert("Fonctionnalité d'export à implémenter");

@@ -6,6 +6,9 @@ class RemboursementController {
     public static function getAll() {
         $remboursements = Remboursement::getAll();
         Flight::json($remboursements);
+        error_log("Appel à getStatistiques");
+        $remboursements = Remboursement::getAll();
+        error_log(print_r($remboursements, true));
     }
 
     public static function getById($id) {
@@ -31,4 +34,6 @@ class RemboursementController {
         $remboursements = Remboursement::getRemboursementsParMois();
         Flight::json($remboursements);
     }
+
+
 } 
