@@ -170,7 +170,7 @@ function genererPDF(id_pret) {
 ### Variables globales
 ```javascript
 const CONFIG = {
-    apiBase: "http://localhost/T/Examen_S4/ws",
+    apiBase: "http://localhost/Projet-S4/ws",
     currency: "€",
     dateFormat: "fr-FR"
 };

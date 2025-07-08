@@ -92,7 +92,7 @@ ob_start();
 </div>
 
 <script>
-    const apiBase = "http://localhost/T/Examen_S4/ws";
+    const apiBase = "http://localhost/Projet-S4/ws";
 
     function ajax(method, url, data, callback) {
         const xhr = new XMLHttpRequest();

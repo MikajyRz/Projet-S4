@@ -130,7 +130,7 @@ ob_start();
 </div>
 
 <script>
-    const apiBase = "http://localhost/T/Examen_S4/ws";
+    const apiBase = "http://localhost/Projet-S4/ws";
     let dashboardData = {};
 
     function ajax(method, url, data, callback) {
