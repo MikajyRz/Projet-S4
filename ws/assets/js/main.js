@@ -29,7 +29,6 @@ function ajax(method, url, data, callback) {
     xhr.send(data);
 }
 
-// Fonction pour afficher les notifications
 function showNotification(message, type = 'success') {
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
@@ -42,7 +41,6 @@ function showNotification(message, type = 'success') {
     }, 3000);
 }
 
-// Fonction pour confirmer les actions
 function confirmAction(message) {
     return confirm(message);
 }
