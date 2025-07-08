@@ -165,7 +165,7 @@ ob_start();
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const apiBase = "http://localhost/T/Examen_S4/ws";
+    const apiBase = "http://localhost/Projet-S4/ws";
 
     function ajax(method, url, data, callback) {
         const xhr = new XMLHttpRequest();

@@ -1,30 +1,19 @@
--- Création de la base de données
 CREATE DATABASE IF NOT EXISTS pret_db;
 USE pret_db;
 
--- Table des utilisateurs de connexion
-CREATE TABLE pret_login (
-    id_login INT AUTO_INCREMENT PRIMARY KEY,
-    email VARCHAR(100) NOT NULL,
-    mdp VARCHAR(100) NOT NULL
-);
 
--- Table des fonds
 CREATE TABLE pret_fond (
     id_fond INT AUTO_INCREMENT PRIMARY KEY,
     motif VARCHAR(50),
     montant DECIMAL(15,2) NOT NULL
 );
 
--- Table des clients
 CREATE TABLE pret_client (
     id_client INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(50) NOT NULL,
-    email VARCHAR(100) NOT NULL,
-    numro_telephone VARCHAR(15)
+    email VARCHAR(100) NOT NULL
 );
 
--- Table des types de prêts
 CREATE TABLE pret_type_pret (
     id_type_pret INT AUTO_INCREMENT PRIMARY KEY,
     nom VARCHAR(50) NOT NULL,
@@ -33,7 +22,6 @@ CREATE TABLE pret_type_pret (
     assurance DECIMAL(5,2) DEFAULT 0
 );
 
--- Table des prêts
 CREATE TABLE pret_pret (
     id_pret INT AUTO_INCREMENT PRIMARY KEY,
     montant DECIMAL(15,2) NOT NULL,
@@ -45,7 +33,6 @@ CREATE TABLE pret_pret (
     FOREIGN KEY (id_type_pret) REFERENCES pret_type_pret(id_type_pret)
 );
 
--- Table des remboursements
 CREATE TABLE pret_remboursement (
     id_remboursement INT AUTO_INCREMENT PRIMARY KEY,
     id_pret INT NOT NULL,
@@ -59,21 +46,3 @@ CREATE TABLE pret_remboursement (
     FOREIGN KEY (id_pret) REFERENCES pret_pret(id_pret)
 );
 
--- Insertion de données de test
-INSERT INTO pret_login (email, mdp) VALUES 
-('admin@pret.com', 'admin123');
-
-INSERT INTO pret_fond (motif, montant) VALUES 
-('Capital initial', 1000000.00),
-('Dépôt supplémentaire', 500000.00);
-
-INSERT INTO pret_client (nom, email) VALUES 
-('Jean Dupont', 'jean.dupont@email.com'),
-('Marie Martin', 'marie.martin@email.com'),
-('Pierre Durand', 'pierre.durand@email.com');
-
-INSERT INTO pret_type_pret (nom, taux, duree, assurance) VALUES 
-('Prêt personnel', 8.50, 24, 1.50),
-('Prêt immobilier', 6.20, 120, 2.00),
-('Prêt étudiant', 5.80, 36, 0.80),
-('Prêt professionnel', 9.20, 60, 2.50); 

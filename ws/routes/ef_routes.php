@@ -5,6 +5,11 @@ require_once __DIR__ . '/../controllers/FondController.php';
 require_once __DIR__ . '/../controllers/RemboursementController.php';
 require_once __DIR__ . '/../controllers/PdfController.php';
 
+
+// Routes d'authentification
+Flight::route('POST /login', ['AuthController', 'login']);
+Flight::route('POST /register', ['AuthController', 'register']);
+
 // Routes pour les clients
 Flight::route('GET /clients', ['ClientController', 'getAll']);
 Flight::route('GET /clients/@id', ['ClientController', 'getById']);

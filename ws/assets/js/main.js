@@ -1,7 +1,7 @@
 // Fonction utilitaire pour les appels AJAX
 function ajax(method, url, data, callback) {
     const xhr = new XMLHttpRequest();
-    xhr.open(method, "http://localhost/T/Examen_S4/ws" + url, true);
+    xhr.open(method, "http://localhost/Projet-S4/ws" + url, true);
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     xhr.onreadystatechange = () => {
         if (xhr.readyState === 4 && xhr.status === 200) {
